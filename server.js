@@ -29,7 +29,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
-const store = new MongoDBStore(session)({
+export const store = new MongoDBStore(session)({
   uri: process.env.SESSION_URI || 'mongodb://localhost:27017/your-session-db', // Provide a default value if SESSION_URI is not set
   collection: 'sessions',
 });

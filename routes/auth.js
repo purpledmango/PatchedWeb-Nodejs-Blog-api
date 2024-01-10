@@ -15,9 +15,10 @@ router.post('/logout', logout);
 
 router.put("/update-user", updateAuthorInfo);
 
-router.get("/get-user", getAuthorInfo)
+router.get("/get-user", getAuthorInfo);
 
-router.delete("/delete-user/:authorId", deleteAuthor)
-router.get("/get-authors", getAllAuthors)
+router.delete("/delete-user/:authorId", deleteAuthor);
+
+router.get("/get-authors", getAllAuthors);
 
 export default router;

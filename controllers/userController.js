@@ -1,6 +1,7 @@
 import UserModel from "../models/userM.js";
 import bcrypt from 'bcryptjs';
 import authMiddleware from "../middlewares/authMiddleWare.js";
+// import { store as sessionStore } from "../server.js"
 
 // Handles the login
 export const login = async (req, res) => {
@@ -64,19 +65,17 @@ export const logout = async (req, res) => {
 // Gets the Author Info
 export const getAuthorInfo = async (req, res) => {
   try {
-    // The authMiddleware checks if the user is authenticated
-    // If not authenticated, it will return a 401 Unauthorized response
+    // 
     authMiddleware(req, res, async () => {
-      // Get the user profile data from the session
+      // 
       const userUUID = await req.session.user.uuid;
-      console.log("User UUID:", userUUID);
 
-      // Find user data in the database using the user's UUID
+
       const userData = await UserModel.findOne({ uuid: userUUID });
 
       const { email, name, _id, group } = userData._doc
 
-      // Return the user profile data
+
       res.status(200).json({ message: "Session", email, name, _id, group });
     });
   } catch (error) {
