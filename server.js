@@ -6,6 +6,8 @@ import MongoDBStore from 'connect-mongodb-session';
 import connectToDb from './database/db.js';
 import AuthRoutes from './routes/auth.js';
 import ArticleRoutes from './routes/article.js';
+import KPIRoutes from './routes/kpis.js';
+import UserRoutes from './routes/users.js';
 import authMiddleware from './middlewares/authMiddleWare.js';
 
 import { fileURLToPath } from 'url';
@@ -57,6 +59,8 @@ app.get('/', (req, res) => {
 
 app.use('/auth', AuthRoutes);
 app.use('/article', authMiddleware, ArticleRoutes);
+app.use('/kpi', KPIRoutes);
+app.use('/users', UserRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

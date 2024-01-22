@@ -43,6 +43,10 @@ const PostSchema = Schema({
         type: ObjectId,
         ref: "Articles",
     }],
+    views: {
+        default: 0,
+        type: Number
+    }
 }, { timestamps: true });
 
 PostSchema.pre("save", async function (next) {
