@@ -21,18 +21,17 @@ connectToDb();
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ['http://localhost:your-port-number', 'https://bloggy.mroadn.com'],
     credentials: true,
   })
 );
-
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 export const store = new MongoDBStore(session)({
-  uri: process.env.SESSION_URI || 'mongodb://localhost:27017/your-session-db', // Provide a default value if SESSION_URI is not set
+  uri: process.env.DB_URI || 'mongodb://localhost:27017/your-session-db', // Provide a default value if SESSION_URI is not set
   collection: 'sessions',
 });
 
@@ -47,7 +46,7 @@ app.use(
     resave: false,
     store: store, // Use the MongoDBStore for session storage
     cookie: {
-      maxAge: 10800000, // 3 hours in milliseconds
+      maxAge: 108000000, // 3 hours in milliseconds
     },
   })
 );
@@ -66,3 +65,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`\n 🚀Server Online on PORT-${PORT} 💡`);
 });
+
