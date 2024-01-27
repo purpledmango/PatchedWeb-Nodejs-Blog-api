@@ -117,6 +117,7 @@ router.get('/top-articles', async (req, res) => {
                 $project: {
                     _id: 1,
                     title: 1,
+                    slug: 1,
                     body: 1,
                     author: 1,
                     meta_tags: 1,

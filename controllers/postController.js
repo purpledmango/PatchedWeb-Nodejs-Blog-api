@@ -27,11 +27,29 @@ export const getAllPosts = async (req, res) => {
   }
 };
 
+export const getPost = async (req, res) => {
+  try {
+    const { slug } = req.params; // Use req.params instead of req.params.slug
 
+    const post = await PostModel.findOne({ slug: slug });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not Found" }); // Return statement added
+    }
+
+    return res.status(200).json({
+      message: "Post Fetched",
+      data: post, // Fix variable name from s to post
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
 
 export const addPost = async (req, res) => {
   try {
-    console.log(req.file.filename);
+
     const { title, author, content, active } = req.body;
 
     // Create a new post based on the request body
@@ -50,7 +68,7 @@ export const addPost = async (req, res) => {
       return res.status(401).json({ message: "Unable to save post" });
     }
 
-    res.status(201).json({ message: "New Post Added Successfully!", ...savedPost._doc });
+    res.status(201).json({ message: "New Post Added Successfully!", data: savedPost });
   } catch (error) {
     console.error(`Error encountered while saving Post ---> ${error}`);
 
@@ -66,15 +84,16 @@ export const addPost = async (req, res) => {
 
 export const editPost = async (req, res) => {
   try {
-    const slug = req.params.slug; // Corrected to use req.params.uuid
+    const slug = req.params.slug; // Corrected to use req.params.slug
+    const { title } = req.body
     const article = await PostModel.findOneAndUpdate({ slug: slug }, req.body, { new: true });
 
-    // Check if the article with the given UUID exists
+    // Check if the article with the given slug exists
     if (!article) {
       return res.status(404).json({ message: "The Article Does not Exist!" });
     }
 
-    res.status(200).json({ message: "Article Modified", ...article._doc });
+    res.status(200).json({ message: "Article Modified", data: article });
 
   } catch (error) {
     console.error(`Error occurred while updating post: ${error}`);
