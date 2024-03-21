@@ -1,5 +1,6 @@
 import UserModel from "../models/userM.js";
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import authMiddleware from "../middlewares/authMiddleWare.js";
 // import { store as sessionStore } from "../server.js"
 
@@ -8,56 +9,51 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (req.session.user) {
-      return res.status(400).json({ message: "User is already logged in!" });
-    }
-
     const user = await UserModel.findOne({ email: email });
 
     if (!user) {
-      return res.status(400).json({ message: "No Such Author Exists!" });
+      const error = new Error(`User with ${email} not found`);
+      error.status(400);
+      throw error;
+    } else {
+      const passwordMatch = await bcrypt.compare(password, user.hashedPassword);
+
+      if (passwordMatch) {
+        const payload = {
+          uid: user.uuid,
+          email: user.email,
+          name: user.name,
+          group: user.group
+
+        };
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "3h" });
+        res.cookie('token', token, { httpOnly: true, maxAge: 3 * 60 * 60 * 1000 });
+        return res.status(200).json({
+          token
+        });
+      } else {
+        const error = new Error("Wrong Password!");
+        error.status(400);
+        throw error;
+      }
     }
-
-    const passwordCorrect = await bcrypt.compare(password, user.passwordHash);
-    if (!passwordCorrect) {
-      return res.status(400).json({ message: "The Password is Incorrect!" });
-    }
-
-    const { password: userPassword, ...others } = user._doc;
-
-    const userCookieInfo = {
-      id: user._id, email: user.email, group: user.group
-    }
-    req.session.user = {
-      ...userCookieInfo, authenticated: true
-    };
-
-    res.status(200).json({ message: "Successful Login", ...others });
   } catch (error) {
-    res.status(500).json(error);
-    console.log(error);
+    console.error(error);
+    res.status(error.status || 500).json({
+      status: 'fail',
+      message: error.message || 'Internal Server Error'
+    });
   }
-}
-
+};
 // Handles the Logout
 export const logout = async (req, res) => {
   try {
     // Check if the user is logged in or if there is an active session
-    if (!req.session.user) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
     // Destroy the session and log out the user
-    req.session.destroy((err) => {
-      if (err) {
-        console.error("Error while destroying session:", err);
-        return res.status(500).json({ message: "Error while Logging out" });
-      }
-      // Return a success message as the response
-      res.clearCookie('connect.sid');
-      res.status(200).json({ message: "Logged out successfully!" });
-    });
-  } catch (error) {
+    res.clearCookie('token');
+    res.status(200).json({ message: "Logged out successfully!" });
+  }
+  catch (error) {
     res.status(500).json(error);
   }
 }
@@ -110,7 +106,7 @@ export const register = async (req, res) => {
 
     const newUser = new UserModel({
       email: req.body.email,
-      passwordHash: hashed,
+      hashedPassword: hashed,
       name: req.body.name,
       bio: req.body.bio
     });

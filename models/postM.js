@@ -21,7 +21,6 @@ const PostSchema = Schema({
     slug: {
         type: String,
         unique: [true, "Post with Same Title Exists"]
-
     },
     body: String,
     thumbnail: {
@@ -29,9 +28,8 @@ const PostSchema = Schema({
         path: { type: String }
     },
     author: {
-        type: ObjectId,
-        ref: "Users",
-        required: true,
+        type: String, // Assuming the uid is a string
+        ref: "User", // Reference to the User model
     },
     meta_tags: StringArray,
     meta_keywords: StringArray,
@@ -39,10 +37,10 @@ const PostSchema = Schema({
         type: Boolean,
         default: false,
     },
-    relatedPosts: [{
-        type: ObjectId,
-        ref: "Articles",
-    }],
+    // relatedPosts: [{
+    //     type: ObjectId,
+    //     ref: "Article", // Assuming your Article model is named "Article"
+    // }],
     views: {
         default: 0,
         type: Number
@@ -60,16 +58,10 @@ PostSchema.pre("save", async function (next) {
         this.slug = `${this.slug}-${slugCount}`;
     }
 
-    // If the thumbnail is not set and a file is uploaded, set the thumbnail property
-    if (!this.thumbnail.filename && this.thumbnail.path) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const extension = this.thumbnail.filename.split('.').pop();
-        this.thumbnail.filename = `thumbnail-${uniqueSuffix}.${extension}`;
-    }
 
     next();
 });
 
-const PostModel = model("Articles", PostSchema);
+const PostModel = model("Article", PostSchema); // Changed model name to "Article"
 
 export default PostModel;

@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import UserModel from '../models/userM.js';
 
+import { getAuthorInfo, updateAuthorInfo, deleteAuthor, getAllAuthors } from "../controllers/userController.js"
+
 const router = Router();
 
 // Endpoints
@@ -25,5 +27,14 @@ router.get("/get-name/:uid", async (req, res) => {
         return res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
 });
+
+router.put("/update-user", updateAuthorInfo);
+
+router.get("/get-user", getAuthorInfo);
+
+router.delete("/delete-user/:authorId", deleteAuthor);
+
+router.get("/get-authors", getAllAuthors);
+
 
 export default router;

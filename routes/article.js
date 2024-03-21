@@ -25,7 +25,7 @@ const router = Router();
 
 router.get('/posts', getAllPosts);
 router.get('/get-post/:slug', getPost);
-router.post('/add-post', upload.single('thumbnail'), addPost);
+router.post('/add-post', addPost);
 router.delete('/delete-post/:slug', deltePost)
 router.put("/edit-post/:slug", editPost)
 router.get('/uploads/:filename', (req, res) => {

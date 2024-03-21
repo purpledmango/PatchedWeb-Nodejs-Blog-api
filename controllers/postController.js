@@ -1,6 +1,39 @@
 import PostModel from '../models/postM.js';
 
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ error: `User with ${email} not found` });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.hashedPassword);
+
+    if (!passwordMatch) {
+      return res.status(400).json({ error: "Wrong Password!" });
+    }
+
+    const payload = {
+      uid: user.uid,
+      email: user.email,
+      name: user.name,
+      group: user.group
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "3h" });
+
+    // Set the JWT token in a cookie
+    res.cookie('token', token, { httpOnly: true, maxAge: 3 * 60 * 60 * 1000 }); // Max age in milliseconds
+
+    return res.status(200).json({ token });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ status: 'fail', message: 'Internal Server Error' });
+  }
+};
 
 export const getAllPosts = async (req, res) => {
   try {
@@ -56,10 +89,7 @@ export const addPost = async (req, res) => {
     const newPost = new PostModel({ title, author, content, active });
 
     // Add file details to the post model if needed
-    if (req.file) {
-      newPost.thumbnail.filename = req.file.filename;
-      newPost.thumbnail.path = req.file.path;
-    }
+
 
     // Save the new post to the database
     const savedPost = await newPost.save();

@@ -9,6 +9,7 @@ import ArticleRoutes from './routes/article.js';
 import KPIRoutes from './routes/kpis.js';
 import UserRoutes from './routes/users.js';
 import authMiddleware from './middlewares/authMiddleWare.js';
+import cookieParser from 'cookie-parser'
 
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
@@ -19,37 +20,20 @@ const app = express();
 connectToDb();
 
 // Middleware
+app.use(cookieParser());
 app.use(
   cors({
-    origin: ['http://localhost:your-port-number', 'https://bloggy.mroadn.com'],
+    origin: process.env.NODE_ENV === 'production' ? process.env.PROD_ORIGIN_HOST : process.env.__filenameDEV_ORIGIN_HOST,
     credentials: true,
   })
 );
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '8mb' }));
+app.use(express.json({ limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
-export const store = new MongoDBStore(session)({
-  uri: process.env.DB_URI || 'mongodb://localhost:27017/your-session-db', // Provide a default value if SESSION_URI is not set
-  collection: 'sessions',
-});
 
-store.on('error', function (error) {
-  console.error(error);
-});
-
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
-    saveUninitialized: false,
-    resave: false,
-    store: store, // Use the MongoDBStore for session storage
-    cookie: {
-      maxAge: 108000000, // 3 hours in milliseconds
-    },
-  })
-);
+const JWT_SECRET = process.env.JWT_SECRET
 
 // Routes
 app.get('/', (req, res) => {
@@ -65,4 +49,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`\n 🚀Server Online on PORT-${PORT} 💡`);
 });
-
