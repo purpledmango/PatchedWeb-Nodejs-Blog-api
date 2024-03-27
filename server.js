@@ -23,7 +23,7 @@ connectToDb();
 app.use(cookieParser());
 app.use(
   cors({
-    origin: process.env.NODE_ENV === 'production' ? process.env.PROD_ORIGIN_HOST : process.env.__filenameDEV_ORIGIN_HOST,
+    origin: process.env.NODE_ENV === 'production' ? process.env.PROD_ORIGIN_HOST : process.env.DEV_ORIGIN_HOST;
     credentials: true,
   })
 );
