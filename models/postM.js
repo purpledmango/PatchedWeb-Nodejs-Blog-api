@@ -20,12 +20,13 @@ const PostSchema = Schema({
     },
     slug: {
         type: String,
-        unique: [true, "Post with Same Title Exists"]
+        unique: [true, "Post with Same Title Exists"],
+
     },
-    body: String,
+    content: String,
     thumbnail: {
         filename: { type: String },
-        path: { type: String }
+        path: { type: String },
     },
     author: {
         type: String, // Assuming the uid is a string
@@ -38,26 +39,29 @@ const PostSchema = Schema({
         default: false,
     },
     // relatedPosts: [{
-    //     type: ObjectId,
-    //     ref: "Article", // Assuming your Article model is named "Article"
+    //   type: ObjectId,
+    //   ref: "Article", // Assuming your Article model is named "Article"
     // }],
     views: {
         default: 0,
-        type: Number
-    }
+        type: Number,
+    },
 }, { timestamps: true });
 
-PostSchema.pre("save", async function (next) {
-    // Generate the slug from the title
-    this.slug = slug(this.title);
+// Mongoose middleware to handle slug generation only for new documents
+PostSchema.pre('save', async function (next) {
+    // Check if the document is new (isNew property)
+    if (this.isNew) {
+        // Generate the slug from the title
+        this.slug = slug(this.title);
 
-    // Check for existing slugs
-    const similarSlugs = await this.constructor.find({ slug: new RegExp(`^${this.slug}(-([0-9]+))?`, 'i') });
-    if (similarSlugs.length > 0) {
-        const slugCount = similarSlugs.length + 1;
-        this.slug = `${this.slug}-${slugCount}`;
+        // Check for existing slugs (case-insensitive)
+        const similarSlugs = await this.constructor.find({ slug: new RegExp(`^${this.slug}(-([0-9]+))?`, 'i') });
+        if (similarSlugs.length > 0) {
+            const slugCount = similarSlugs.length + 1;
+            this.slug = `${this.slug}-${slugCount}`;
+        }
     }
-
 
     next();
 });

@@ -159,27 +159,31 @@ export const deltePost = async (req, res) => {
   }
 }
 
-export const addThumbnail = (req, res) => {
+export const uploadThumbnail = async (req, res) => {
   try {
-    // Handle the uploaded thumbnail here
+    const { slug } = req.params; // Destructure slug from params
     const thumbnailFile = req.file;
-    const slug = req.params;
-
-    const articleExist = PostModel.find({ slug: slug });
-
-    if (!articleExist) {
-      res.status(400).json({ message: "Sorry Unable to Find The article with that slug" })
-    }
 
     if (!thumbnailFile) {
       return res.status(400).json({ message: 'No thumbnail uploaded' });
     }
 
+    const article = await PostModel.findOne({ slug }); // Use findOne
 
+    if (!article) {
+      res.status(400).json({ message: "Sorry Unable to Find The article with that slug" })
+    }
 
-    console.log(thumbnailFile)
+    article.thumbnail.filename = thumbnailFile.filename;
+    article.thumbnail.path = thumbnailFile.path;
+
+    // Save the updated article
+    await article.save();
+
+    res.status(200).json({ message: 'Thumbnail uploaded successfully!' });
+
   } catch (error) {
-
+    res.status(500).json({ message: "Internal Server Error", error: error });
+    console.log(error)
   }
-
 }

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAllPosts, addPost, editPost, deltePost, getPost } from "../controllers/postController.js";
+import { getAllPosts, addPost, editPost, deltePost, getPost, uploadThumbnail } from "../controllers/postController.js";
 import multer from 'multer';
 import fs from 'fs';
 import PostModel from "../models/postM.js";
@@ -28,7 +28,7 @@ router.get('/posts', getAllPosts);
 router.get('/get-post/:slug', getPost);
 router.post('/add-post', addPost);
 router.delete('/delete-post/:slug', deltePost)
-router.post("/add-thumbnail/:slug", upload.single("thumbnail"),)
+router.post("/add-thumbnail/:slug", upload.single("thumbnail"), uploadThumbnail)
 router.put("/edit-post/:slug", editPost)
 router.get('/uploads/:filename', (req, res) => {
   const { filename } = req.params;

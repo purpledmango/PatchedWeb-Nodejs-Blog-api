@@ -41,7 +41,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/auth', AuthRoutes);
-app.use('/article', authMiddleware, ArticleRoutes);
+app.use('/  ', authMiddleware, ArticleRoutes);
 app.use('/kpi', KPIRoutes);
 app.use('/users', UserRoutes);
 
