@@ -20,7 +20,7 @@ export const login = async (req, res) => {
 
       if (passwordMatch) {
         const payload = {
-          uid: user.uuid,
+          uuid: user.uuid,
           email: user.email,
           name: user.name,
           group: user.group
@@ -29,7 +29,8 @@ export const login = async (req, res) => {
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "3h" });
         res.cookie('token', token, { httpOnly: true, maxAge: 3 * 60 * 60 * 1000 });
         return res.status(200).json({
-          token
+          data: payload,
+
         });
       } else {
         const error = new Error("Wrong Password!");
@@ -45,11 +46,11 @@ export const login = async (req, res) => {
     });
   }
 };
-// Handles the Logout
+
+
 export const logout = async (req, res) => {
   try {
-    // Check if the user is logged in or if there is an active session
-    // Destroy the session and log out the user
+
     res.clearCookie('token');
     res.status(200).json({ message: "Logged out successfully!" });
   }
@@ -101,33 +102,52 @@ export const updateAuthorInfo = async (req, res) => {
 
 export const register = async (req, res) => {
   try {
-    const salt = await bcrypt.genSalt();
-    const hashed = await bcrypt.hash(req.body.password, salt);
+    // Check if the user with the provided email already exists
+    const userExist = await UserModel.findOne({ email: req.body.email });
 
+    if (userExist) {
+      return res.status(400).json({ message: "A user with that email already exists" });
+    }
+
+    // Generate a salt and hash the password
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+    // Create a new user instance
     const newUser = new UserModel({
       email: req.body.email,
-      hashedPassword: hashed,
+      hashedPassword: hashedPassword,
       name: req.body.name,
       bio: req.body.bio
     });
 
+    // Save the new user to the database
     const savedUser = await newUser.save();
-    res.status(200).json({ message: "Signed Up Successfully!", ...savedUser._doc });
 
+    // Prepare the data to return in the response
+    const returnData = {
+      uuid: savedUser.uuid,
+      name: savedUser.name,
+      email: savedUser.email
+    };
+
+    // Send a success response
+    res.status(200).json({ message: "Signed Up Successfully!", returnData });
   } catch (err) {
-    res.status(500).json({ message: err });
-    throw (err);
+    // Handle errors
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
   }
-}
+};
 
 export const parseAuthorInfo = async (req, res) => {
   try {
 
-    const user = await UserModel.findOne({ _id: req.body.id })
+    const user = await UserModel.findOne({ uuid: req.body.uuid })
 
-    const { passwordHash, ...others } = user._doc
+    const { name, uuid, email, group, active, profilePic, bio, createdAt, updatedAt } = user
 
-    res.status(200).json({ message: "User Info Parsed", ...others })
+    res.status(200).json({ message: "User Info Parsed", data: { name, uuid, email, group, active, profilePic, bio, updatedAt, createdAt } })
 
   } catch (err) {
     res.status(500).json({ message: err });

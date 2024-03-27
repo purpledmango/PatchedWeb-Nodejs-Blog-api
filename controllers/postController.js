@@ -158,3 +158,28 @@ export const deltePost = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error", error: error })
   }
 }
+
+export const addThumbnail = (req, res) => {
+  try {
+    // Handle the uploaded thumbnail here
+    const thumbnailFile = req.file;
+    const slug = req.params;
+
+    const articleExist = PostModel.find({ slug: slug });
+
+    if (!articleExist) {
+      res.status(400).json({ message: "Sorry Unable to Find The article with that slug" })
+    }
+
+    if (!thumbnailFile) {
+      return res.status(400).json({ message: 'No thumbnail uploaded' });
+    }
+
+
+
+    console.log(thumbnailFile)
+  } catch (error) {
+
+  }
+
+}

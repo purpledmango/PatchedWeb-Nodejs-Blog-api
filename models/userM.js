@@ -2,6 +2,10 @@ import { Schema, model } from "mongoose";
 import { v4 as uuidv4 } from 'uuid';
 
 const userSchema = new Schema({
+    uuid: {
+        type: String,
+        default: () => uuidv4().slice(1, 7)
+    },
     email: {
         type: String,
         required: true,
@@ -11,12 +15,11 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
-    name: String, // No need to specify type separately
-    bio: String, // No need to specify type separately
-    profilePic: Buffer,
-    userStatus: {
-        type: Boolean,
-        default: false,
+    name: String,
+    bio: String,
+    profilePic: {
+        picName: String,
+        picPath: String,
     },
     group: {
         type: String,
