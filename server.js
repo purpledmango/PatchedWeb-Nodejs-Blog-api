@@ -22,12 +22,14 @@ connectToDb();
 
 // MIDDLEWARES
 app.use(cookieParser());
-app.use(
-  cors({
-    origin: process.env.DEV_ORIGIN_HOST,
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' ? [process.env.ADMIN_CLIENT_HOST, process.env.APP_CLIENT_HOST] : process.env.DEV_ORIGIN_HOST,
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+
 app.use(express.urlencoded({ extended: true, limit: '8mb' }));
 app.use(express.json({ limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
