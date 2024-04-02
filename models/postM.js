@@ -16,7 +16,7 @@ const PostSchema = Schema({
     },
     title: {
         type: String,
-        required: true,
+
     },
     slug: {
         type: String,
@@ -38,10 +38,7 @@ const PostSchema = Schema({
         type: Boolean,
         default: false,
     },
-    // relatedPosts: [{
-    //   type: ObjectId,
-    //   ref: "Article", // Assuming your Article model is named "Article"
-    // }],
+
     views: {
         default: 0,
         type: Number,

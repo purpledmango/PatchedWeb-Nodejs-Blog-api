@@ -19,11 +19,11 @@ dotenv.config();
 const app = express();
 connectToDb();
 
-// Middleware
+console.log("NODe enviroment", process.env.NODE_ENV)
 app.use(cookieParser());
 app.use(
   cors({
-    origin: process.env.NODE_ENV === 'production' ? process.env.PROD_ORIGIN_HOST : process.env.DEV_ORIGIN_HOST;
+    origin: process.env.DEV_ORIGIN_HOST,
     credentials: true,
   })
 );
@@ -41,7 +41,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/auth', AuthRoutes);
-app.use('/  ', authMiddleware, ArticleRoutes);
+app.use('/article', authMiddleware, ArticleRoutes);
 app.use('/kpi', KPIRoutes);
 app.use('/users', UserRoutes);
 

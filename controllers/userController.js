@@ -8,46 +8,46 @@ import authMiddleware from "../middlewares/authMiddleWare.js";
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log("Credentials", req.body);
 
+    // Using findOne instead of find to get a single user
     const user = await UserModel.findOne({ email: email });
 
     if (!user) {
-      const error = new Error(`User with ${email} not found`);
-      error.status(400);
-      throw error;
-    } else {
-      const passwordMatch = await bcrypt.compare(password, user.hashedPassword);
-
-      if (passwordMatch) {
-        const payload = {
-          uuid: user.uuid,
-          email: user.email,
-          name: user.name,
-          group: user.group
-
-        };
-        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "3h" });
-        res.cookie('token', token, { httpOnly: true, maxAge: 3 * 60 * 60 * 1000 });
-        return res.status(200).json({
-          data: payload,
-
-        });
-      } else {
-        const error = new Error("Wrong Password!");
-        error.status(400);
-        throw error;
-      }
+      // Returning here to avoid further execution if user not found
+      return res.status(404).json({ message: "No user with the email found" });
     }
+
+    const passwordMatch = await bcrypt.compare(password, user.hashedPassword);
+
+    if (!passwordMatch) {
+      return res.status(400).json({ message: "Unable to Match Password" });
+    }
+
+    const payload = {
+      uuid: user.uuid,
+      email: user.email,
+      name: user.name,
+      group: user.group
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "3h" });
+    // Set the token as a cookie with httponly flag and 3 hours expiration
+    res.cookie('token', token, { httpOnly: true, maxAge: 3 * 60 * 60 * 1000 });
+
+    // Sending payload data along with the response
+    return res.status(200).json({
+      message: "Login Successfull",
+      data: payload,
+    });
+
   } catch (error) {
     console.error(error);
-    res.status(error.status || 500).json({
-      status: 'fail',
-      message: error.message || 'Internal Server Error'
+    res.status(500).json({
+      message: 'Internal Server Error'
     });
   }
 };
-
-
 export const logout = async (req, res) => {
   try {
 
@@ -142,18 +142,22 @@ export const register = async (req, res) => {
 
 export const parseAuthorInfo = async (req, res) => {
   try {
+    console.log(req.body)
+    const user = await UserModel.findOne({ uuid: req.body.uuid });
 
-    const user = await UserModel.findOne({ uuid: req.body.uuid })
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    const { name, uuid, email, group, active, profilePic, bio, createdAt, updatedAt } = user
+    const { name, uuid, email, group, active, bio, createdAt, updatedAt, profilePic } = user;
 
-    res.status(200).json({ message: "User Info Parsed", data: { name, uuid, email, group, active, profilePic, bio, updatedAt, createdAt } })
+    res.status(200).json({ message: "User Info Parsed", data: { name, uuid, email, group, active, profilePic, bio, updatedAt, createdAt } });
 
   } catch (err) {
-    res.status(500).json({ message: err });
-    throw (err);
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
   }
-}
+};
 
 export const deleteAuthor = async (req, res) => {
   try {
