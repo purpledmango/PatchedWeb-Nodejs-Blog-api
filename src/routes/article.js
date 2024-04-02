@@ -1,19 +1,19 @@
 import { Router } from "express";
-import { getAllPosts, addPost, editPost, deltePost, getPost, uploadThumbnail } from "../controllers/postController.js";
+import { getAllPosts, addPost, editPost, deltePost, getPost, uploadThumbnail } from "../controllers/articleController.js";
 import multer from 'multer';
 import fs from 'fs';
-import PostModel from "../models/postM.js";
 
-// Ensure the 'uploads' folder exists
+
+// Upload Forder Exists?
 const uploadFolder = 'uploads/';
 if (!fs.existsSync(uploadFolder)) {
   fs.mkdirSync(uploadFolder);
 }
 
-// Set up multer for file uploads
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, uploadFolder); // Specify the folder where files will be stored
+    cb(null, uploadFolder);
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' + file.originalname); // Use unique filenames
@@ -34,12 +34,12 @@ router.get('/uploads/:filename', (req, res) => {
   const { filename } = req.params;
   const filePath = path.join(__dirname, '..', uploadFolder, filename);
 
-  // Check if the file exists
+
   if (fs.existsSync(filePath)) {
-    // Serve the file
+
     res.sendFile(filePath);
   } else {
-    // File not found
+
     res.status(404).json({ message: 'File not found' });
   }
 });

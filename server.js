@@ -1,14 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import session from 'express-session';
-import MongoDBStore from 'connect-mongodb-session';
-import connectToDb from './database/db.js';
-import AuthRoutes from './routes/auth.js';
-import ArticleRoutes from './routes/article.js';
-import KPIRoutes from './routes/kpis.js';
-import UserRoutes from './routes/users.js';
-import authMiddleware from './middlewares/authMiddleWare.js';
+import connectToDb from './src/database/db.js';
+import AuthRoutes from './src/routes/auth.js';
+import ArticleRoutes from './src/routes/article.js';
+import KPIRoutes from './src/routes/kpis.js';
+import UserRoutes from './src/routes/users.js';
+import authMiddleware from './src/middlewares/authMiddleWare.js';
 import cookieParser from 'cookie-parser'
 
 import { fileURLToPath } from 'url';
@@ -16,10 +14,13 @@ import path, { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 dotenv.config();
+
+
 const app = express();
+
 connectToDb();
 
-console.log("NODe enviroment", process.env.NODE_ENV)
+// MIDDLEWARES
 app.use(cookieParser());
 app.use(
   cors({
@@ -35,15 +36,18 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const JWT_SECRET = process.env.JWT_SECRET
 
-// Routes
+// ROUTES
 app.get('/', (req, res) => {
-  res.send('Greetings From Mr. Oadn API');
+  res.send('Greetings From Patched Web API');
 });
 
 app.use('/auth', AuthRoutes);
 app.use('/article', authMiddleware, ArticleRoutes);
 app.use('/kpi', KPIRoutes);
 app.use('/users', UserRoutes);
+
+
+// SERVER STATUS
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

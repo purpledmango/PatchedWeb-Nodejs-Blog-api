@@ -32,7 +32,7 @@ router.put("/update-user", updateAuthorInfo);
 
 router.get("/get-user", getAuthorInfo);
 
-router.delete("/delete-user/:authorId", deleteAuthor);
+router.delete("/delete-user/:uuid", deleteAuthor);
 
 router.get("/get-authors", getAllAuthors);
 

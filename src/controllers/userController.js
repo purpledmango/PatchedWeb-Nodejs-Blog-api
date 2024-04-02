@@ -165,10 +165,10 @@ export const deleteAuthor = async (req, res) => {
       return res.status(403).json({ message: 'You do not have the access required for that' });
     }
 
-    const authorId = req.params.authorId; // Assuming you use "authorId" as the route parameter
+    const { uuid } = req.params; // Assuming you use "authorId" as the route parameter
 
     // Check if the author exists
-    const existingAuthor = await UserModel.findById(authorId);
+    const existingAuthor = await UserModel.findOne({ uuid: uuid });
     if (!existingAuthor) {
       return res.status(404).json({ message: 'Author not found' });
     }
