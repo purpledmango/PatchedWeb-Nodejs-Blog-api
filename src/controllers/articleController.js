@@ -64,19 +64,19 @@ export const getPost = async (req, res) => {
   try {
     const { slug } = req.params; // Use req.params instead of req.params.slug
 
-    const post = await PostModel.findOne({ slug: slug });
+    const article = await PostModel.findOne({ slug: slug });
 
-    if (!post) {
-      return res.status(404).json({ message: "Post not Found" }); // Return statement added
+    if (!article) {
+      res.status(404).json({ message: "Article not Found" });
     }
 
-    return res.status(200).json({
-      message: "Post Fetched",
-      data: post, // Fix variable name from s to post
+    res.status(200).json({
+      message: "Article Fetched",
+      data: article
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
@@ -103,10 +103,10 @@ export const addPost = async (req, res) => {
     console.error(`Error encountered while saving Post ---> ${error}`);
 
     if (error.name === "ValidationError") {
-      return res.status(400).json({ message: "Please input all fields" });
+      res.status(400).json({ message: "Please input all fields" });
     }
 
-    return res.status(500).json({ message: "Internal Server Error", error: error });
+    res.status(500).json({ message: "Internal Server Error", error: error });
   }
 };
 

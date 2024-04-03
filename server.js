@@ -7,6 +7,7 @@ import ArticleRoutes from './src/routes/article.js';
 import KPIRoutes from './src/routes/kpis.js';
 import UserRoutes from './src/routes/users.js';
 import authMiddleware from './src/middlewares/authMiddleWare.js';
+import clientRoutes from "./src/routes/client.js"
 import cookieParser from 'cookie-parser'
 
 import { fileURLToPath } from 'url';
@@ -47,7 +48,7 @@ app.use('/auth', AuthRoutes);
 app.use('/article', authMiddleware, ArticleRoutes);
 app.use('/kpi', KPIRoutes);
 app.use('/users', UserRoutes);
-
+app.use('/client', clientRoutes)
 
 // SERVER STATUS
 

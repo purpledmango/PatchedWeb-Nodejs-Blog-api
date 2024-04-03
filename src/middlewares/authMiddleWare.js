@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 const authMiddleware = (req, res, next) => {
-    // Check if the JWT token is present in the cookie
-    console.log("Coookie Data", req.cookies)
+
     const token = req.cookies.token;
 
     // If the token is not present, return unauthorized

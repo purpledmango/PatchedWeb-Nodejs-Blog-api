@@ -10,10 +10,10 @@ const router = Router();
 router.get("/get-name/:uid", async (req, res) => {
     try {
         const { uid } = req.params;
-        console.log(uid);
+
 
         // Corrected: Use await to wait for the asynchronous operation
-        const user = await UserModel.findById(uid);
+        const user = await UserModel.findOne({ uuid: uid });
 
         if (!user) {
             // Corrected: Change the status code to 404 when user is not found
