@@ -76,7 +76,7 @@ export const addPost = async (req, res) => {
 export const editPost = async (req, res) => {
   try {
     const slug = req.params.slug;
-    const { title } = req.body
+
     const article = await PostModel.findOneAndUpdate({ slug: slug }, req.body, { new: true });
 
     if (!article) {

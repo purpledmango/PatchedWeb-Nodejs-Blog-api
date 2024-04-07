@@ -32,8 +32,9 @@ const PostSchema = Schema({
         type: String, // Assuming the uid is a string
         ref: "User", // Reference to the User model
     },
-    meta_tags: StringArray,
-    meta_keywords: StringArray,
+    tags: [StringArray],
+    meta_keywords: String,
+    meta_description: String,
     active: {
         type: Boolean,
         default: false,
