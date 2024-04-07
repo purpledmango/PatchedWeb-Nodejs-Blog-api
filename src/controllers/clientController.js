@@ -2,7 +2,7 @@ import PostModel from "../models/postM.js";
 
 const topThreeArticles = async (req, res) => {
     try {
-        const threeArticles = await PostModel.find().sort({ views: -1 }).limit(3);
+        const threeArticles = await PostModel.find({ active: true }).sort({ views: -1 }).limit(3);
 
         if (!threeArticles || threeArticles.length === 0) {
             return res.status(404).json({ message: "Unable to find articles" });
@@ -17,7 +17,7 @@ const topThreeArticles = async (req, res) => {
 
 const allArticles = async (req, res) => {
     try {
-        const allArticles = await PostModel.find({}).sort({ createdAt: -1 });
+        const allArticles = await PostModel.find({ active: true }).sort({ createdAt: -1 });
         if (!allArticles || allArticles.length === 0) {
             return res.status(404).json({ message: "Unable to find articles" });
         }
