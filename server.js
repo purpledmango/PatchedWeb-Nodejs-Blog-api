@@ -8,6 +8,7 @@ import KPIRoutes from './src/routes/kpis.js';
 import UserRoutes from './src/routes/users.js';
 import authMiddleware from './src/middlewares/authMiddleWare.js';
 import clientRoutes from "./src/routes/client.js"
+import tagRoutes from "./src/routes/tag.js"
 import cookieParser from 'cookie-parser'
 
 import { fileURLToPath } from 'url';
@@ -24,7 +25,7 @@ connectToDb();
 // MIDDLEWARES
 app.use(cookieParser());
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' ? [process.env.ADMIN_CLIENT_HOST, process.env.APP_CLIENT_HOST] : process.env.DEV_ORIGIN_HOST,
+  origin: [process.env.ADMIN_CLIENT_HOST, process.env.APP_CLIENT_HOST, process.env.DEV_ORIGIN_HOST],
   credentials: true,
 };
 
@@ -46,9 +47,10 @@ app.get('/', (req, res) => {
 
 app.use('/auth', AuthRoutes);
 app.use('/article', authMiddleware, ArticleRoutes);
-app.use('/kpi', KPIRoutes);
+app.use('/kpi', authMiddleware, KPIRoutes);
 app.use('/users', UserRoutes);
 app.use('/client', clientRoutes)
+app.use('/tag', authMiddleware, tagRoutes)
 
 // SERVER STATUS
 

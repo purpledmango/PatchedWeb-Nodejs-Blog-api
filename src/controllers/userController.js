@@ -14,7 +14,7 @@ export const login = async (req, res) => {
     const user = await UserModel.findOne({ email: email });
 
     if (!user) {
-      // Returning here to avoid further execution if user not found
+
       return res.status(404).json({ message: "No user with the email found" });
     }
 
@@ -31,11 +31,11 @@ export const login = async (req, res) => {
       group: user.group
     };
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "3h" });
-    // Set the token as a cookie with httponly flag and 3 hours expiration
-    res.cookie('token', token, { httpOnly: true, maxAge: 3 * 60 * 60 * 1000 });
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "2d" });
 
-    // Sending payload data along with the response
+    res.cookie('token', token, { httpOnly: true, maxAge: 48 * 60 * 60 * 1000 });
+
+
     return res.status(200).json({
       message: "Login Successfull",
       data: payload,
@@ -59,7 +59,7 @@ export const logout = async (req, res) => {
   }
 }
 
-// Gets the Author Info
+
 export const getAuthorInfo = async (req, res) => {
   try {
     // 
@@ -76,16 +76,15 @@ export const getAuthorInfo = async (req, res) => {
       res.status(200).json({ message: "Session", email, name, _id, group });
     });
   } catch (error) {
-    // Handle errors by sending a 500 Internal Server Error response
+
     res.status(500).json(error);
   }
 };
 
-// Updates the Author Info
+
 export const updateAuthorInfo = async (req, res) => {
   try {
-    // The authMiddleware checks if the user is authenticated
-    // If not authenticated, it will return a 401 Unauthorized response
+
     authMiddleware(req, res, async () => {
       const newData = req.body;
 
@@ -102,18 +101,18 @@ export const updateAuthorInfo = async (req, res) => {
 
 export const register = async (req, res) => {
   try {
-    // Check if the user with the provided email already exists
+
     const userExist = await UserModel.findOne({ email: req.body.email });
 
     if (userExist) {
       return res.status(400).json({ message: "A user with that email already exists" });
     }
 
-    // Generate a salt and hash the password
+
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
-    // Create a new user instance
+
     const newUser = new UserModel({
       email: req.body.email,
       hashedPassword: hashedPassword,
@@ -121,20 +120,20 @@ export const register = async (req, res) => {
       bio: req.body.bio
     });
 
-    // Save the new user to the database
+
     const savedUser = await newUser.save();
 
-    // Prepare the data to return in the response
+
     const returnData = {
       uuid: savedUser.uuid,
       name: savedUser.name,
       email: savedUser.email
     };
 
-    // Send a success response
+
     res.status(200).json({ message: "Signed Up Successfully!", returnData });
   } catch (err) {
-    // Handle errors
+
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
   }
@@ -165,15 +164,15 @@ export const deleteAuthor = async (req, res) => {
       return res.status(403).json({ message: 'You do not have the access required for that' });
     }
 
-    const { uuid } = req.params; // Assuming you use "authorId" as the route parameter
+    const { uuid } = req.params;
 
-    // Check if the author exists
+
     const existingAuthor = await UserModel.findOne({ uuid: uuid });
     if (!existingAuthor) {
       return res.status(404).json({ message: 'Author not found' });
     }
 
-    // Perform the deletion
+
     await UserModel.findByIdAndDelete(authorId);
 
     res.status(200).json({ message: 'Author deleted successfully' });
