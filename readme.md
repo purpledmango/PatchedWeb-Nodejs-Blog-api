@@ -18,7 +18,11 @@ touch .env
 DB_URI= //ADD YOUR MONGODB DB URI HERE //
 PORT= /// YOUR PORT NO //
 JWT_SECRET= //your_secret_key //
-DEV_ORIGIN_HOST=http://localhost:5173
+DEV_ORIGIN_HOST=http://localhost:9000
+ADMIN_CLIENT_HOST=//domain name //
+APP_CLIENT_HOST= // domain name //  
+
+
 ```
 4. Install dependencies:
  ```bash
